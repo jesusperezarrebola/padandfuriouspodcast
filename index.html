@@ -30,7 +30,6 @@
             padding: 20px 0 40px 0;
         }
 
-        /* --- MEJORA: Logo --- */
         .logo-img {
             max-width: 180px;
             height: auto;
@@ -46,7 +45,6 @@
             margin: 0;
         }
 
-        /* --- MEJORA: Sección Redes --- */
         .social-bar {
             display: flex;
             gap: 15px;
@@ -72,12 +70,23 @@
         .link-bluesky { background: var(--bluesky); }
         .social-link:hover { transform: translateY(-3px); filter: brightness(1.1); }
 
+        /* Contenedor principal para dividir Episodios y Feed Social */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 30px;
-            width: 100%;
-            max-width: 1100px;
         }
 
         .card {
@@ -96,17 +105,8 @@
             box-shadow: 12px 12px 0px var(--amarillo);
         }
 
-        .card h2 {
-            margin-top: 0;
-            color: var(--amarillo);
-            font-size: 1.4rem;
-        }
-
-        .card p {
-            color: #bbb;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
+        .card h2 { color: var(--amarillo); font-size: 1.4rem; margin-top: 0; }
+        .card p { color: #bbb; font-size: 0.9rem; line-height: 1.4; }
 
         .btn-download {
             margin-top: auto;
@@ -121,12 +121,17 @@
             border-bottom: 4px solid #900;
         }
 
-        .btn-download:hover { background: #ff5722; }
-
         iframe { margin: 15px 0; border-radius: 12px; border: none; }
 
-        /* --- MEJORA: Errores --- */
-        #loading { color: var(--amarillo); font-weight: bold; }
+        /* Estilo para el lateral de Bluesky */
+        .sidebar {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px solid var(--bluesky);
+            height: fit-content;
+        }
+
         #error-display {
             background: #441111;
             color: #ffaaaa;
@@ -135,7 +140,6 @@
             border: 2px solid red;
             margin-bottom: 20px;
             display: none;
-            max-width: 600px;
         }
     </style>
 </head>
@@ -148,13 +152,24 @@
     </header>
 
     <div class="social-bar">
-        <a href="https://open.spotify.com/show/1wra6rQEeUQzo8dTKCKfOC?si=9b03f6980eaa4ae0" class="link-spotify social-link" target="_blank">🎧 Spotify</a>
+        <a href="https://open.spotify.com/show/TU_ID_PODCAST" class="link-spotify social-link" target="_blank">🎧 Spotify</a>
         <a href="https://bsky.app/profile/padandfurious.bsky.social" class="link-bluesky social-link" target="_blank">🦋 Bluesky</a>
     </div>
 
     <div id="error-display"></div>
-    <div id="loading">Cargando episodios cargados de furia...</div>
-    <div class="grid" id="podcast-container"></div>
+    
+    <div class="main-content">
+        <section>
+            <div id="loading" style="color: var(--amarillo); font-weight: bold; text-align: center;">Cargando episodios...</div>
+            <div class="grid" id="podcast-container"></div>
+        </section>
+
+        <aside class="sidebar">
+            <h3 style="color: var(--bluesky); margin-top: 0;">Furia en Bluesky</h3>
+            <a class="bluesky-timeline" data-height="600" data-dnt="true" href="https://bsky.app/profile/padandfurious.bsky.social">Posts de Pad & Furious</a>
+            <script async src="https://embed.bsky.app/static/embed.js" charset="utf-8"></script>
+        </aside>
+    </div>
 
     <script>
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9gFu8RzmdEpjIH1zy4jawppY8Q_5jTZFYHaaUbP0PVbq1auKHp1UtuW521hxrjLVC-wrM3SGItmg1/pub?output=csv';
@@ -166,33 +181,22 @@
             document.getElementById('loading').style.display = 'none';
         }
 
-async function loadEpisodes() {
+        async function loadEpisodes() {
             try {
-                // Añadimos un número aleatorio al final para evitar caché y errores 403 por sesión
                 const response = await fetch(`${SHEET_URL}&cachebuster=${Math.random()}`);
                 
                 if (!response.ok) {
-                    if(response.status === 403) {
-                        throw new Error("Error 403: El archivo no es público. Ve a 'Compartir' en Google Sheets y cámbialo a 'Cualquier persona con el enlace'.");
-                    }
-                    throw new Error(`Error de conexión. Status: ${response.status}`);
+                    throw new Error(response.status === 403 ? "Error 403: El archivo no es público." : "Error de conexión.");
                 }
 
                 const data = await response.text();
-                
-                // Verificación de si el contenido parece un CSV
-                if (!data.includes(',') && !data.includes(';')) {
-                    throw new Error("El archivo recibido no tiene formato de tabla. Asegúrate de haber publicado como 'CSV'.");
-                }
-
                 const rows = data.split('\n').slice(1);
                 const container = document.getElementById('podcast-container');
                 document.getElementById('loading').style.display = 'none';
 
                 let validRows = 0;
-                rows.forEach((row, index) => {
+                rows.forEach((row) => {
                     const columns = row.split(',');
-                    // Verificamos que al menos tenga título y spotify_id
                     if (columns.length < 3 || !columns[0].trim()) return;
 
                     const [titulo, descripcion, spotify_id, drive_link] = columns;
@@ -200,21 +204,19 @@ async function loadEpisodes() {
 
                     const card = document.createElement('div');
                     card.className = 'card';
+                    // CORRECCIÓN AQUÍ: Eliminado el '3' sobrante y corregido el template string
                     card.innerHTML = `
                         <h2>${titulo}</h2>
                         <p>${descripcion}</p>
-                        <iframe src="https://open.spotify.com/embed/episode/$${spotify_id.trim()}?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allow="encrypted-media"></iframe>
+                        <iframe src="https://open.spotify.com/embed/episode/${spotify_id.trim()}?utm_source=generator&theme=0" width="100%" height="152" allow="encrypted-media"></iframe>
                         <a href="${drive_link ? drive_link.trim() : '#'}" target="_blank" class="btn-download">📥 DESCARGAR MP3</a>
                     `;
                     container.appendChild(card);
                 });
 
-                if (validRows === 0) {
-                    showError("El Excel parece estar vacío o las columnas no están bien configuradas.");
-                }
+                if (validRows === 0) showError("No hay datos en el Excel.");
 
             } catch (error) {
-                console.error('Error detallado:', error);
                 showError(error.message);
             }
         }
