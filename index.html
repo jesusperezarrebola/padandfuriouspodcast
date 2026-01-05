@@ -196,20 +196,26 @@
 
                 let validRows = 0;
                 rows.forEach((row) => {
-                    const columns = row.split(',');
-                    if (columns.length < 3 || !columns[0].trim()) return;
+                    // Esta línea es "mágica": separa por comas pero ignora las que están dentro de comillas
+                    const columns = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                    
+                    if (!columns || columns.length < 3) return;
 
-                    const [titulo, descripcion, spotify_id, drive_link] = columns;
+                    // Limpiamos las comillas que Google añade automáticamente si hay comas
+                    const titulo = columns[0].replace(/^"|"$/g, '').trim();
+                    const descripcion = columns[1].replace(/^"|"$/g, '').trim();
+                    const spotify_id = columns[2].replace(/^"|"$/g, '').trim();
+                    const drive_link = columns[3] ? columns[3].replace(/^"|"$/g, '').trim() : '#';
+
                     validRows++;
 
                     const card = document.createElement('div');
                     card.className = 'card';
-                    // CORRECCIÓN AQUÍ: Eliminado el '3' sobrante y corregido el template string
                     card.innerHTML = `
                         <h2>${titulo}</h2>
                         <p>${descripcion}</p>
-                        <iframe src="https://open.spotify.com/embed/episode/${spotify_id.trim()}?utm_source=generator&theme=0" width="100%" height="152" allow="encrypted-media"></iframe>
-                        <a href="${drive_link ? drive_link.trim() : '#'}" target="_blank" class="btn-download">📥 DESCARGAR MP3</a>
+                        <iframe src="https://open.spotify.com/embed/episode/$${spotify_id}?utm_source=generator&theme=0" width="100%" height="152" allow="encrypted-media"></iframe>
+                        <a href="${drive_link}" target="_blank" class="btn-download">📥 DESCARGAR MP3</a>
                     `;
                     container.appendChild(card);
                 });
