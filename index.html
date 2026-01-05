@@ -11,6 +11,7 @@
             --amarillo: #FFEA00;
             --oscuro: #121212;
             --gris-card: #1E1E1E;
+            --bluesky: #0085ff;
         }
 
         body {
@@ -26,7 +27,15 @@
 
         header {
             text-align: center;
-            padding: 40px 0;
+            padding: 20px 0 40px 0;
+        }
+
+        /* --- MEJORA: Logo --- */
+        .logo-img {
+            max-width: 180px;
+            height: auto;
+            filter: drop-shadow(0px 0px 15px var(--rojo));
+            margin-bottom: 10px;
         }
 
         h1 {
@@ -34,8 +43,34 @@
             color: var(--amarillo);
             text-transform: uppercase;
             text-shadow: 4px 4px 0px var(--rojo);
-            margin-bottom: 10px;
+            margin: 0;
         }
+
+        /* --- MEJORA: Sección Redes --- */
+        .social-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .social-link {
+            text-decoration: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            border-bottom: 4px solid rgba(0,0,0,0.3);
+        }
+
+        .link-spotify { background: #1DB954; }
+        .link-bluesky { background: var(--bluesky); }
+        .social-link:hover { transform: translateY(-3px); filter: brightness(1.1); }
 
         .grid {
             display: grid;
@@ -88,50 +123,95 @@
 
         .btn-download:hover { background: #ff5722; }
 
-        iframe { margin: 15px 0; border-radius: 12px; }
+        iframe { margin: 15px 0; border-radius: 12px; border: none; }
 
+        /* --- MEJORA: Errores --- */
         #loading { color: var(--amarillo); font-weight: bold; }
+        #error-display {
+            background: #441111;
+            color: #ffaaaa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid red;
+            margin-bottom: 20px;
+            display: none;
+            max-width: 600px;
+        }
     </style>
 </head>
 <body>
 
     <header>
+        <img src="logo.png" alt="Pad & Furious" class="logo-img">
         <h1>PAD & FURIOUS</h1>
         <p>El repositorio oficial para los que le dan furiosamente al pad.</p>
     </header>
 
+    <div class="social-bar">
+        <a href="TU_LINK_DE_PERFIL_SPOTIFY" class="link-spotify social-link" target="_blank">🎧 Spotify</a>
+        <a href="https://bsky.app/profile/TU_USUARIO.bsky.social" class="link-bluesky social-link" target="_blank">🦋 Bluesky</a>
+    </div>
+
+    <div id="error-display"></div>
     <div id="loading">Cargando episodios cargados de furia...</div>
     <div class="grid" id="podcast-container"></div>
 
     <script>
-        // PEGA AQUÍ TU URL DE "PUBLICAR EN LA WEB" (FORMATO CSV)
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9gFu8RzmdEpjIH1zy4jawppY8Q_5jTZFYHaaUbP0PVbq1auKHp1UtuW521hxrjLVC-wrM3SGItmg1/pub?output=csv';
+
+        function showError(msg) {
+            const display = document.getElementById('error-display');
+            display.style.display = 'block';
+            display.innerHTML = `<h3>⚠️ ¡Algo ha explotado!</h3><p>${msg}</p>`;
+            document.getElementById('loading').style.display = 'none';
+        }
 
         async function loadEpisodes() {
             try {
                 const response = await fetch(SHEET_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`No se pudo conectar con Google Sheets. Status: ${response.status}`);
+                }
+
                 const data = await response.text();
-                const rows = data.split('\n').slice(1); // Ignorar cabecera
+                
+                // Verificación de si el contenido parece un CSV
+                if (!data.includes(',') && !data.includes(';')) {
+                    throw new Error("El archivo recibido no tiene formato de tabla. Asegúrate de haber publicado como 'CSV'.");
+                }
+
+                const rows = data.split('\n').slice(1);
                 const container = document.getElementById('podcast-container');
                 document.getElementById('loading').style.display = 'none';
 
-                rows.forEach(row => {
-                    const [titulo, descripcion, spotify_id, drive_link] = row.split(',');
-                    if (!titulo) return;
+                let validRows = 0;
+                rows.forEach((row, index) => {
+                    const columns = row.split(',');
+                    // Verificamos que al menos tenga título y spotify_id
+                    if (columns.length < 3 || !columns[0].trim()) return;
+
+                    const [titulo, descripcion, spotify_id, drive_link] = columns;
+                    validRows++;
 
                     const card = document.createElement('div');
                     card.className = 'card';
                     card.innerHTML = `
                         <h2>${titulo}</h2>
                         <p>${descripcion}</p>
-                        <iframe src="https://open.spotify.com/embed/episode/${spotify_id.trim()}?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allow="encrypted-media"></iframe>
-                        <a href="${drive_link.trim()}" target="_blank" class="btn-download">📥 DESCARGAR MP3</a>
+                        <iframe src="https://open.spotify.com/embed/episode/$${spotify_id.trim()}?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allow="encrypted-media"></iframe>
+                        <a href="${drive_link ? drive_link.trim() : '#'}" target="_blank" class="btn-download">📥 DESCARGAR MP3</a>
                     `;
                     container.appendChild(card);
                 });
+
+                if (validRows === 0) {
+                    showError("El Excel parece estar vacío o las columnas no están bien configuradas.");
+                }
+
             } catch (error) {
-                console.error('Error cargando el podcast:', error);
-                document.getElementById('loading').innerText = 'Error al cargar los episodios.';
+                console.error('Error detallado:', error);
+                showError(error.message);
             }
         }
 
