@@ -11,13 +11,12 @@
             --amarillo: #FFEA00;
             --oscuro: #121212;
             --gris-card: #1E1E1E;
-            --bluesky: #0085ff;
         }
 
         body {
             background-color: var(--oscuro);
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -25,68 +24,16 @@
             align-items: center;
         }
 
-        header {
-            text-align: center;
-            padding: 20px 0 40px 0;
-        }
-
-        .logo-img {
-            max-width: 180px;
-            height: auto;
-            filter: drop-shadow(0px 0px 15px var(--rojo));
-            margin-bottom: 10px;
-        }
-
-        h1 {
-            font-size: 3rem;
-            color: var(--amarillo);
-            text-transform: uppercase;
-            text-shadow: 4px 4px 0px var(--rojo);
-            margin: 0;
-        }
-
-        .social-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .social-link {
-            text-decoration: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.3s;
-            border-bottom: 4px solid rgba(0,0,0,0.3);
-        }
-
-        .link-spotify { background: #1DB954; }
-        .link-bluesky { background: var(--bluesky); }
-        .social-link:hover { transform: translateY(-3px); filter: brightness(1.1); }
-
-        /* Contenedor principal para dividir Episodios y Feed Social */
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 30px;
-            width: 100%;
-            max-width: 1200px;
-        }
-
-        @media (max-width: 900px) {
-            .main-content { grid-template-columns: 1fr; }
-        }
-
+        header { text-align: center; padding: 20px 0 40px 0; }
+        .logo-img { max-width: 180px; filter: drop-shadow(0px 0px 15px var(--rojo)); margin-bottom: 10px; }
+        h1 { font-size: 3rem; color: var(--amarillo); text-transform: uppercase; text-shadow: 4px 4px 0px var(--rojo); margin: 0; }
+        
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 30px;
+            width: 100%;
+            max-width: 1100px;
         }
 
         .card {
@@ -95,21 +42,13 @@
             border-radius: 20px;
             padding: 20px;
             box-shadow: 8px 8px 0px var(--naranja);
-            transition: 0.3s ease;
             display: flex;
             flex-direction: column;
         }
 
-        .card:hover {
-            transform: scale(1.02);
-            box-shadow: 12px 12px 0px var(--amarillo);
-        }
-
-        .card h2 { color: var(--amarillo); font-size: 1.4rem; margin-top: 0; }
-        .card p { color: #bbb; font-size: 0.9rem; line-height: 1.4; }
-
+        .card h2 { color: var(--amarillo); margin-top: 0; }
         .btn-download {
-            margin-top: auto;
+            margin-top: 15px;
             background: var(--rojo);
             color: white;
             text-align: center;
@@ -117,30 +56,11 @@
             padding: 12px;
             border-radius: 10px;
             font-weight: bold;
-            text-transform: uppercase;
             border-bottom: 4px solid #900;
         }
 
-        iframe { margin: 15px 0; border-radius: 12px; border: none; }
-
-        /* Estilo para el lateral de Bluesky */
-        .sidebar {
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 20px;
-            border: 2px solid var(--bluesky);
-            height: fit-content;
-        }
-
-        #error-display {
-            background: #441111;
-            color: #ffaaaa;
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid red;
-            margin-bottom: 20px;
-            display: none;
-        }
+        iframe { border-radius: 12px; border: none; margin-top: 10px; }
+        #error-display { background: #441111; color: #ffaaaa; padding: 20px; border-radius: 10px; display: none; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -148,82 +68,67 @@
     <header>
         <img src="logo.png" alt="Pad & Furious" class="logo-img">
         <h1>PAD & FURIOUS</h1>
-        <p>El repositorio oficial para los que le dan furiosamente al pad.</p>
     </header>
 
-    <div class="social-bar">
-        <a href="https://open.spotify.com/show/TU_ID_PODCAST" class="link-spotify social-link" target="_blank">🎧 Spotify</a>
-        <a href="https://bsky.app/profile/padandfurious.bsky.social" class="link-bluesky social-link" target="_blank">🦋 Bluesky</a>
-    </div>
-
     <div id="error-display"></div>
-    
-    <div class="main-content">
-        <section>
-            <div id="loading" style="color: var(--amarillo); font-weight: bold; text-align: center;">Cargando episodios...</div>
-            <div class="grid" id="podcast-container"></div>
-        </section>
-
-        <aside class="sidebar">
-            <h3 style="color: var(--bluesky); margin-top: 0;">Furia en Bluesky</h3>
-            <a class="bluesky-timeline" data-height="600" data-dnt="true" href="https://bsky.app/profile/padandfurious.bsky.social">Posts de Pad & Furious</a>
-            <script async src="https://embed.bsky.app/static/embed.js" charset="utf-8"></script>
-        </aside>
-    </div>
+    <div id="loading" style="color: var(--amarillo); font-weight: bold;">Cargando episodios...</div>
+    <div class="grid" id="podcast-container"></div>
 
     <script>
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9gFu8RzmdEpjIH1zy4jawppY8Q_5jTZFYHaaUbP0PVbq1auKHp1UtuW521hxrjLVC-wrM3SGItmg1/pub?output=csv';
 
-        function showError(msg) {
-            const display = document.getElementById('error-display');
-            display.style.display = 'block';
-            display.innerHTML = `<h3>⚠️ ¡Algo ha explotado!</h3><p>${msg}</p>`;
-            document.getElementById('loading').style.display = 'none';
+        // FUNCIÓN MAESTRA PARA LEER CSV CON COMAS
+        function parseCSV(text) {
+            const result = [];
+            let row = [''];
+            let inQuotes = false;
+            let i = 0;
+
+            for (let char of text) {
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    row.push('');
+                } else if (char === '\n' && !inQuotes) {
+                    result.push(row);
+                    row = [''];
+                } else {
+                    row[row.length - 1] += char;
+                }
+            }
+            result.push(row);
+            return result;
         }
 
         async function loadEpisodes() {
             try {
-                const response = await fetch(`${SHEET_URL}&cachebuster=${Math.random()}`);
+                const response = await fetch(`${SHEET_URL}&cb=${Date.now()}`);
+                const rawText = await response.text();
+                const data = parseCSV(rawText);
                 
-                if (!response.ok) {
-                    throw new Error(response.status === 403 ? "Error 403: El archivo no es público." : "Error de conexión.");
-                }
-
-                const data = await response.text();
-                const rows = data.split('\n').slice(1);
                 const container = document.getElementById('podcast-container');
                 document.getElementById('loading').style.display = 'none';
 
-                let validRows = 0;
-                rows.forEach((row) => {
-                    // Esta línea es "mágica": separa por comas pero ignora las que están dentro de comillas
-                    const columns = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-                    
-                    if (!columns || columns.length < 3) return;
+                // Empezamos en 1 para saltar la cabecera del Excel
+                for (let i = 1; i < data.length; i++) {
+                    const columns = data[i];
+                    if (columns.length < 3 || !columns[0]) continue;
 
-                    // Limpiamos las comillas que Google añade automáticamente si hay comas
-                    const titulo = columns[0].replace(/^"|"$/g, '').trim();
-                    const descripcion = columns[1].replace(/^"|"$/g, '').trim();
-                    const spotify_id = columns[2].replace(/^"|"$/g, '').trim();
-                    const drive_link = columns[3] ? columns[3].replace(/^"|"$/g, '').trim() : '#';
-
-                    validRows++;
+                    const [titulo, descripcion, spotify_id, drive_link] = columns;
 
                     const card = document.createElement('div');
                     card.className = 'card';
                     card.innerHTML = `
-                        <h2>${titulo}</h2>
-                        <p>${descripcion}</p>
-                        <iframe src="https://open.spotify.com/embed/episode/$${spotify_id}?utm_source=generator&theme=0" width="100%" height="152" allow="encrypted-media"></iframe>
-                        <a href="${drive_link}" target="_blank" class="btn-download">📥 DESCARGAR MP3</a>
+                        <h2>${titulo.trim()}</h2>
+                        <p>${descripcion.trim()}</p>
+                        <iframe src="https://open.spotify.com/embed/episode/${spotify_id.trim()}?utm_source=generator&theme=0" width="100%" height="152" allow="encrypted-media"></iframe>
+                        <a href="${drive_link ? drive_link.trim() : '#'}" target="_blank" class="btn-download">📥 DESCARGAR MP3</a>
                     `;
                     container.appendChild(card);
-                });
-
-                if (validRows === 0) showError("No hay datos en el Excel.");
-
+                }
             } catch (error) {
-                showError(error.message);
+                document.getElementById('error-display').style.display = 'block';
+                document.getElementById('error-display').innerHTML = "Error cargando datos: " + error.message;
             }
         }
 
