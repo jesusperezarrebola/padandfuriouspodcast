@@ -208,7 +208,11 @@
 
         function renderNextBatch() {
             const container = document.getElementById('podcast-container');
-            const nextBatch = filteredEpisodes.slice(currentIndex, currentIndex + EPISODES_PER_PAGE);
+            const btn = document.getElementById('load-more-btn');
+            
+            // Calculamos el final del lote actual
+            const end = Math.min(currentIndex + EPISODES_PER_PAGE, filteredEpisodes.length);
+            const nextBatch = filteredEpisodes.slice(currentIndex, end);
             
             nextBatch.forEach(columns => {
                 const [titulo, descripcion, spotify_id, drive_link, temporada, esNitro] = columns;
@@ -228,9 +232,16 @@
                 container.appendChild(card);
             });
 
-            currentIndex += EPISODES_PER_PAGE;
-            const btn = document.getElementById('load-more-btn');
-            btn.style.display = currentIndex >= filteredEpisodes.length ? 'none' : 'block';
+            // Actualizamos el índice global
+            currentIndex = end;
+
+            // Lógica de visibilidad del botón:
+            // Si el índice actual es menor que el total de episodios filtrados, mostramos el botón.
+            if (currentIndex < filteredEpisodes.length) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
         }
 
         async function init() {
