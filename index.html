@@ -166,12 +166,16 @@
             document.getElementById('loading').style.display = 'none';
         }
 
-        async function loadEpisodes() {
+async function loadEpisodes() {
             try {
-                const response = await fetch(SHEET_URL);
+                // Añadimos un número aleatorio al final para evitar caché y errores 403 por sesión
+                const response = await fetch(`${SHEET_URL}&cachebuster=${Math.random()}`);
                 
                 if (!response.ok) {
-                    throw new Error(`No se pudo conectar con Google Sheets. Status: ${response.status}`);
+                    if(response.status === 403) {
+                        throw new Error("Error 403: El archivo no es público. Ve a 'Compartir' en Google Sheets y cámbialo a 'Cualquier persona con el enlace'.");
+                    }
+                    throw new Error(`Error de conexión. Status: ${response.status}`);
                 }
 
                 const data = await response.text();
