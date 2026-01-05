@@ -17,7 +17,7 @@
         body {
             background-color: var(--oscuro);
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -25,57 +25,19 @@
             align-items: center;
         }
 
-        header {
-            text-align: center;
-            padding: 20px 0 30px 0;
-        }
-
-        .logo-img {
-            max-width: 180px;
-            height: auto;
-            filter: drop-shadow(0px 0px 15px var(--rojo));
-            margin-bottom: 10px;
-        }
-
-        h1 {
-            font-size: 3rem;
-            color: var(--amarillo);
-            text-transform: uppercase;
-            text-shadow: 4px 4px 0px var(--rojo);
-            margin: 0;
-        }
-
-        /* --- BOTONES DE REDES RECUPERADOS --- */
-        .social-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 40px;
-            justify-content: center;
-        }
-
+        header { text-align: center; padding: 20px 0 30px 0; }
+        .logo-img { max-width: 180px; filter: drop-shadow(0px 0px 15px var(--rojo)); margin-bottom: 10px; }
+        h1 { font-size: 3rem; color: var(--amarillo); text-transform: uppercase; text-shadow: 4px 4px 0px var(--rojo); margin: 0; }
+        
+        .social-bar { display: flex; gap: 15px; margin-bottom: 40px; }
         .social-link {
-            text-decoration: none;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.3s;
-            border-bottom: 4px solid rgba(0,0,0,0.3);
-            text-transform: uppercase;
-            font-size: 0.9rem;
+            text-decoration: none; color: white; padding: 12px 24px; border-radius: 12px;
+            font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;
+            border-bottom: 4px solid rgba(0,0,0,0.3); text-transform: uppercase; font-size: 0.8rem;
         }
-
         .link-spotify { background: #1DB954; }
         .link-bluesky { background: var(--bluesky); }
-        
-        .social-link:hover { 
-            transform: translateY(-3px); 
-            filter: brightness(1.1);
-            box-shadow: 0px 5px 15px rgba(255, 61, 0, 0.3);
-        }
+        .social-link:hover { transform: translateY(-3px); filter: brightness(1.1); }
 
         .grid {
             display: grid;
@@ -91,34 +53,45 @@
             border-radius: 20px;
             padding: 20px;
             box-shadow: 8px 8px 0px var(--naranja);
-            transition: 0.3s ease;
             display: flex;
             flex-direction: column;
+            animation: fadeIn 0.5s ease forwards;
         }
 
-        .card:hover {
-            transform: scale(1.02);
-            box-shadow: 12px 12px 0px var(--amarillo);
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .card h2 { color: var(--amarillo); font-size: 1.4rem; margin-top: 0; }
-        .card p { color: #bbb; font-size: 0.9rem; line-height: 1.4; }
-
+        
         .btn-download {
-            margin-top: auto;
-            background: var(--rojo);
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
+            margin-top: auto; background: var(--rojo); color: white;
+            text-align: center; text-decoration: none; padding: 12px;
+            border-radius: 10px; font-weight: bold; text-transform: uppercase;
             border-bottom: 4px solid #900;
         }
 
+        /* BOTÓN CARGAR MÁS */
+        #load-more-btn {
+            margin: 40px 0;
+            background: var(--amarillo);
+            color: var(--oscuro);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0px 0px 20px var(--rojo);
+            display: none; /* Se activa por JS */
+            transition: 0.3s;
+        }
+
+        #load-more-btn:hover { transform: scale(1.1); background: white; }
+
         iframe { border-radius: 12px; border: none; margin-top: 10px; }
-        #loading { color: var(--amarillo); font-weight: bold; }
         #error-display { background: #441111; color: #ffaaaa; padding: 20px; border-radius: 10px; display: none; margin-bottom: 20px; }
     </style>
 </head>
@@ -127,68 +100,90 @@
     <header>
         <img src="logo.png" alt="Pad & Furious" class="logo-img">
         <h1>PAD & FURIOUS</h1>
-        <p>El repositorio oficial para los que le dan furiosamente al pad.</p>
     </header>
 
     <div class="social-bar">
-        <a href="https://open.spotify.com/show/1wra6rQEeUQzo8dTKCKfOC?si=8aecc57377674483" class="link-spotify social-link" target="_blank">🎧 Spotify</a>
+        <a href="https://open.spotify.com/show/1wra6rQEeUQzo8dTKCKfOC?si=908ca7b4c9b44866" class="link-spotify social-link" target="_blank">🎧 Spotify</a>
         <a href="https://bsky.app/profile/padandfurious.bsky.social" class="link-bluesky social-link" target="_blank">🦋 Bluesky</a>
     </div>
 
     <div id="error-display"></div>
-    <div id="loading">Cargando episodios cargados de furia...</div>
+    <div id="loading" style="color: var(--amarillo); font-weight: bold;">CONECTANDO CON EL REPOSITORIO...</div>
+    
     <div class="grid" id="podcast-container"></div>
+    
+    <button id="load-more-btn">Ver más capítulos</button>
 
     <script>
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9gFu8RzmdEpjIH1zy4jawppY8Q_5jTZFYHaaUbP0PVbq1auKHp1UtuW521hxrjLVC-wrM3SGItmg1/pub?output=csv';
+        
+        let allEpisodes = [];
+        let currentIndex = 0;
+        const EPISODES_PER_PAGE = 6; // Ajusta cuántos quieres ver a la vez
 
-        // PARSER MAESTRO PARA EVITAR ERRORES CON COMAS
         function parseCSV(text) {
             const result = [];
             let row = [''];
             let inQuotes = false;
             for (let char of text) {
-                if (char === '"') { inQuotes = !inQuotes; }
-                else if (char === ',' && !inQuotes) { row.push(''); }
+                if (char === '"') inQuotes = !inQuotes;
+                else if (char === ',' && !inQuotes) row.push('');
                 else if (char === '\n' && !inQuotes) { result.push(row); row = ['']; }
-                else { row[row.length - 1] += char; }
+                else row[row.length - 1] += char;
             }
             result.push(row);
             return result;
         }
 
-        async function loadEpisodes() {
+        function renderNextBatch() {
+            const container = document.getElementById('podcast-container');
+            const nextBatch = allEpisodes.slice(currentIndex, currentIndex + EPISODES_PER_PAGE);
+            
+            nextBatch.forEach(columns => {
+                if (columns.length < 3 || !columns[0]) return;
+                const [titulo, descripcion, spotify_id, drive_link] = columns;
+                
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <h2>${titulo.trim()}</h2>
+                    <p>${descripcion.trim()}</p>
+                    <iframe src="https://open.spotify.com/embed/episode/${spotify_id.trim()}?utm_source=generator&theme=0" width="100%" height="152" allow="encrypted-media"></iframe>
+                    <a href="${drive_link ? drive_link.trim() : '#'}" target="_blank" class="btn-download">📥 DESCARGAR REPOSITORIO</a>
+                `;
+                container.appendChild(card);
+            });
+
+            currentIndex += EPISODES_PER_PAGE;
+            
+            // Ocultar botón si no hay más
+            const btn = document.getElementById('load-more-btn');
+            if (currentIndex >= allEpisodes.length) {
+                btn.style.display = 'none';
+            } else {
+                btn.style.display = 'block';
+            }
+        }
+
+        async function init() {
             try {
                 const response = await fetch(`${SHEET_URL}&cb=${Date.now()}`);
                 const rawText = await response.text();
                 const data = parseCSV(rawText);
                 
-                const container = document.getElementById('podcast-container');
+                // Saltamos la cabecera y limpiamos filas vacías
+                allEpisodes = data.slice(1).filter(row => row[0] && row[0].trim() !== "");
+                
                 document.getElementById('loading').style.display = 'none';
-
-                for (let i = 1; i < data.length; i++) {
-                    const columns = data[i];
-                    if (columns.length < 3 || !columns[0]) continue;
-
-                    const [titulo, descripcion, spotify_id, drive_link] = columns;
-
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <h2>${titulo.trim()}</h2>
-                        <p>${descripcion.trim()}</p>
-                        <iframe src="https://open.spotify.com/embed/episode/${spotify_id.trim()}?utm_source=generator&theme=0" width="100%" height="152" allow="encrypted-media"></iframe>
-                        <a href="${drive_link ? drive_link.trim() : '#'}" target="_blank" class="btn-download">📥 DESCARGAR MP3</a>
-                    `;
-                    container.appendChild(card);
-                }
+                renderNextBatch();
             } catch (error) {
                 document.getElementById('error-display').style.display = 'block';
                 document.getElementById('error-display').innerHTML = "Error: " + error.message;
             }
         }
 
-        loadEpisodes();
+        document.getElementById('load-more-btn').addEventListener('click', renderNextBatch);
+        init();
     </script>
 </body>
 </html>
